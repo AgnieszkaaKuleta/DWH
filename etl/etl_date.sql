@@ -28,7 +28,3 @@ While @DateInProcess <= @EndDate
 		Set @DateInProcess = DateAdd(d, 1, @DateInProcess);
 	End
 go
-
-DROP TABLE FACT_additional
-DROP TABLE FACT_NEWapplication
-DROP TABLE DIM_Date

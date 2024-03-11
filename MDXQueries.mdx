@@ -1,0 +1,37 @@
+---1
+SELECT NON EMPTY
+    CrossJoin(
+        Hierarchize({DrilldownLevel({[Issuedate].[Month].[All]},,,INCLUDE_CALC_MEMBERS)}),
+        Hierarchize({DrilldownLevel({[Issuedate].[Year].[All]},,,INCLUDE_CALC_MEMBERS)})
+    ) DIMENSION PROPERTIES PARENT_UNIQUE_NAME, HIERARCHY_UNIQUE_NAME ON COLUMNS,
+    NON EMPTY
+    Hierarchize({DrilldownLevel({[DIM Groups].[Age].[All]},,,INCLUDE_CALC_MEMBERS)}) DIMENSION PROPERTIES PARENT_UNIQUE_NAME, HIERARCHY_UNIQUE_NAME ON ROWS
+FROM (
+    SELECT
+        ({[Issuedate].[Month].&[5]}, {[Issuedate].[Year].&[2023], [Issuedate].[Year].&[2022]}) ON COLUMNS
+    FROM [Example]
+)
+WHERE ([Measures].[FACT NE Wapplication Count])
+CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+
+---2 
+
+SELECT NON EMPTY Hierarchize({DrilldownLevel({[Issuedate].[Year].[All]},,,INCLUDE_CALC_MEMBERS)}) DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON COLUMNS  FROM (SELECT ({[Issuedate].[Year].&[2023]}) ON COLUMNS  FROM [Example]) WHERE ([Measures].[FACT Additional Count]) CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+
+--3
+SELECT NON EMPTY Hierarchize({DrilldownLevel({[Issuedate].[Year].[All]},,,INCLUDE_CALC_MEMBERS)}) DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON COLUMNS , NON EMPTY Hierarchize({DrilldownLevel({[Issuedate].[Month].[All]},,,INCLUDE_CALC_MEMBERS)}) DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON ROWS  FROM (SELECT ({[Issuedate].[Year].&[2023]}) ON COLUMNS  FROM [Example]) WHERE ([Measures].[FACT NE Wapplication Count]) CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+
+--4
+SELECT NON EMPTY Hierarchize({DrilldownLevel({[Issuedate].[Year].[All]},,,INCLUDE_CALC_MEMBERS)}) DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON COLUMNS , NON EMPTY CrossJoin(Hierarchize({DrilldownLevel({[DIM JUNK].[Status Of Application].[All]},,,INCLUDE_CALC_MEMBERS)}), Hierarchize({DrilldownLevel({[DIM Contract].[Active].[All]},,,INCLUDE_CALC_MEMBERS)})) DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON ROWS  FROM (SELECT ({[Issuedate].[Year].&[2023], [Issuedate].[Year].&[2022]}) ON COLUMNS  FROM [Example]) WHERE ([Measures].[FACT NE Wapplication Count]) CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+
+--5
+SELECT NON EMPTY Hierarchize({DrilldownLevel({[Issuedate].[Year].[All]},,,INCLUDE_CALC_MEMBERS)}) DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON COLUMNS , NON EMPTY Hierarchize({DrilldownLevel({[DIM JUNK].[Status Of Application].[All]},,,INCLUDE_CALC_MEMBERS)}) DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON ROWS  FROM (SELECT ({[Issuedate].[Year].&[2023], [Issuedate].[Year].&[2022]}) ON COLUMNS  FROM [Example]) WHERE ([Measures].[FACT NE Wapplication Count]) CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+
+--6
+SELECT NON EMPTY Hierarchize({DrilldownLevel({[Issuedate].[Year].[All]},,,INCLUDE_CALC_MEMBERS)}) DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON COLUMNS , NON EMPTY Hierarchize({DrilldownLevel({[DIM Facility].[Names].[All]},,,INCLUDE_CALC_MEMBERS)}) DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON ROWS  FROM (SELECT Generate(Hierarchize({[DIM Facility].[Names].[All]}) AS [XL_Filter_Set_1], TopCount(Filter(Except(DrilldownLevel([XL_Filter_Set_1].Current AS [XL_Filter_HelperSet_1], , 0,INCLUDE_CALC_MEMBERS), [XL_Filter_HelperSet_1]), Not IsEmpty([Measures].[FACT NE Wapplication Count])), 1, [Measures].[FACT NE Wapplication Count])) ON COLUMNS  FROM (SELECT Generate(Hierarchize({[Issuedate].[Year].[All]}) AS [XL_Filter_Set_0], TopCount(Filter(Except(DrilldownLevel([XL_Filter_Set_0].Current AS [XL_Filter_HelperSet_0], , 0,INCLUDE_CALC_MEMBERS), [XL_Filter_HelperSet_0]), Not IsEmpty([Measures].[FACT NE Wapplication Count])), 1, [Measures].[FACT NE Wapplication Count])) ON COLUMNS  FROM [Example] WHERE ([Measures].[FACT NE Wapplication Count])) WHERE ([Measures].[FACT NE Wapplication Count])) WHERE ([Measures].[FACT NE Wapplication Count]) CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+
+--7-nie wychodzi ale mo¿e warto dodaæ œredni¹ avarage ? 
+SELECT NON EMPTY Hierarchize({DrilldownLevel({[Issuedate].[Year].[All]},,,INCLUDE_CALC_MEMBERS)}) DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON COLUMNS , NON EMPTY Hierarchize({DrilldownLevel({[DIM Facility].[Names].[All]},,,INCLUDE_CALC_MEMBERS)}) DIMENSION PROPERTIES PARENT_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME ON ROWS  FROM (SELECT ({[Issuedate].[Year].&[2023]}) ON COLUMNS  FROM [Example]) WHERE ([Measures].[FACT NE Wapplication Count]) CELL PROPERTIES VALUE, FORMAT_STRING, LANGUAGE, BACK_COLOR, FORE_COLOR, FONT_FLAGS
+
+
+

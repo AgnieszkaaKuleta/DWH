@@ -1,0 +1,237 @@
+--1
+WITH
+  MEMBER [Measures].[CurrentYearApplications] AS
+    (
+      [Measures].[FACT NE Wapplication Count],
+      [Issuedate].[Year].[2023]
+    )
+  MEMBER [Measures].[PreviousYearApplications] AS
+    (
+     [Measures].[FACT NE Wapplication Count],
+     [Issuedate].[Year].[2022]
+    )
+SELECT
+  {[Measures].[CurrentYearApplications], [Measures].[PreviousYearApplications]} ON COLUMNS,
+  [DIM Groups].Age.MEMBERS ON ROWS
+FROM
+[Example]
+WHERE
+[Issuedate].[Month].[5]
+
+--2
+SELECT
+CrossJoin([Issuedate].[Year].[2023], 
+		[DIM Additional Lesson].[Name].Members) ON COLUMNS,
+    {[Measures].[FACT Additional Count]} ON ROWS
+  FROM [Example]
+--3
+WITH
+  MEMBER [Measures].[ApplicationsCount] AS
+   [Measures].[FACT NE Wapplication Count] 
+SELECT
+  {[Measures].[ApplicationsCount]} ON COLUMNS,
+  Order(
+    [Issuedate].[Month].MEMBERS,
+    [Measures].[ApplicationsCount],
+    BDESC
+  ) ON ROWS
+FROM
+[Example]
+WHERE
+  [Issuedate].[Year].[2022]
+
+--4 i 5
+WITH
+  MEMBER [Measures].[CurrentYearApplications] AS
+    ([Measures].[FACT NE Wapplication Count],
+	[DIM JUNK].[Status Of Application].&[ACCEPTED],
+      [Issuedate].[Year].CurrentMember
+    )
+  MEMBER [Measures].[PreviousYearApplications] AS
+    (
+      [Measures].[FACT NE Wapplication Count],
+	[DIM JUNK].[Status Of Application].&[ACCEPTED],
+      [Issuedate].[Year].[2022]
+    )
+  MEMBER [Measures].[PercentChange] AS
+    (
+     
+      ([Measures].[CurrentYearApplications] - [Measures].[PreviousYearApplications]) / [Measures].[PreviousYearApplications]
+    ) * 100
+SELECT
+  {[Measures].[PercentChange]} ON COLUMNS
+FROM
+[Example]
+WHERE
+  [Issuedate].[Year].[2023]
+
+--6
+ WITH
+  MEMBER [Measures].[CurrentYearApplications] AS
+    ([Measures].[FACT NE Wapplication Count],
+     [Issuedate].[Year].CurrentMember
+    )
+SELECT
+ {TOPCOUNT( [DIM Facility].[Names].Children, 7,[Measures].[CurrentYearApplications])} ON ROWS,
+  {[Measures].[CurrentYearApplications]} ON COLUMNS
+FROM
+[Example]
+WHERE
+  [Issuedate].[Year].[2023]
+--jeśli chcemy miasta
+ WITH
+  MEMBER [Measures].[CurrentYearApplications] AS
+    ([Measures].[FACT NE Wapplication Count],
+     [Issuedate].[Year].CurrentMember
+    )
+SELECT
+ {TOPCOUNT( [DIM Facility].[City].Children, 7,[Measures].[CurrentYearApplications])} ON ROWS,
+  {[Measures].[CurrentYearApplications]} ON COLUMNS
+FROM
+[Example]
+WHERE
+  [Issuedate].[Year].[2023]
+
+--7
+
+WITH
+MEMBER [Measures].[C] AS(
+[Measures].[Additionals Selected],
+ [DIM Contract].[Active].&[ACTIVE]
+)
+MEMBER [Measures].[A] AS
+ 
+    AVG(
+		[DIM Facility].[Names].CurrentMember,
+		[Measures].[C]
+		)
+  SELECT
+    {TOPCOUNT([DIM Facility].[Names].Members,300,[Measures].[A])} ON ROWS,
+	{[Measures].[A]} ON COLUMNS
+  FROM [Example]
+  WHERE [Issuedate].[Year].&[2023]
+
+--8
+  WITH
+  MEMBER [Measures].[Accepted] AS
+    ([Measures].[FACT NE Wapplication Count],
+	[DIM JUNK].[Status Of Application].[ACCEPTED],
+    [Issuedate].[Year].[2022]
+   )
+    MEMBER [Measures].[Procent] AS
+    ([Measures].[Accepted]/[Measures].[FACT NE Wapplication Count]*100
+   )
+SELECT
+  {[Measures].[Procent]} ON Columns,
+  {BottomCount( [DIM Facility].[Names].Children,30, [Measures].[Procent])} ON rows
+FROM [Example]
+WHERE
+  [Issuedate].[Year].&[2022]
+
+--with city and names 
+ WITH
+  MEMBER [Measures].[Accepted] AS
+    ([Measures].[FACT NE Wapplication Count],
+	[DIM JUNK].[Status Of Application].[ACCEPTED],
+    [Issuedate].[Year].[2022]
+   )
+    MEMBER [Measures].[Procent] AS
+    ([Measures].[Accepted]/[Measures].[FACT NE Wapplication Count]*100
+   )
+SELECT
+  {[Measures].[Procent]} ON Columns,
+  {BottomCount( [DIM Facility].[City].Children * [DIM Facility].[Names].Children,30, [Measures].[Procent])} ON rows
+FROM [Example]
+WHERE
+  [Issuedate].[Year].&[2022]
+
+--9
+WITH
+  MEMBER [Measures].[A] AS
+    ([Measures].[FACT Additional Count],
+	[DIM_ApplicationJUNK].[Two Parents].&[BOTH])
+SELECT
+  [Measures].[A] ON 0,
+  [DIM Additional Lesson].[Name].Members ON 1
+FROM [Example]
+WHERE [DIM Additional Lesson].[Start Year].[2023]
+
+---wiele lat
+
+WITH
+  MEMBER [Measures].[A] AS
+    ([Measures].[FACT Additional Count],
+	[DIM_ApplicationJUNK].[Two Parents].&[BOTH])
+SELECT
+  {[Measures].[A]*[Issuedate].[issue_date].[Year]} ON 0,
+  [DIM Additional Lesson].[Name].Members ON 1
+FROM [Example]
+
+--10
+  WITH
+  MEMBER [Measures].[Cancelled] AS
+    ([Measures].[FACT NE Wapplication Count],
+	[DIM JUNK].[Status Of Application].[ACCEPTED],
+	[DIM JUNK].[Meeting Cancelled].&[CANCELLED]
+   )
+   MEMBER [Measures].[Accepted] AS
+    ([Measures].[FACT NE Wapplication Count],
+	[DIM JUNK].[Status Of Application].[ACCEPTED]
+   )
+    MEMBER [Measures].[Procent] AS
+    ([Measures].[Cancelled]/[Measures].[Accepted]*100
+   )
+SELECT
+  {[Measures].[Procent]} ON Columns
+FROM [Example]
+WHERE [Issuedate].[Year].[2023]
+
+--wiele lat
+ WITH
+  MEMBER [Measures].[Cancelled] AS
+    ([Measures].[FACT NE Wapplication Count],
+	[DIM JUNK].[Status Of Application].[ACCEPTED],
+	[DIM JUNK].[Meeting Cancelled].&[CANCELLED]
+   )
+   MEMBER [Measures].[Accepted] AS
+    ([Measures].[FACT NE Wapplication Count],
+	[DIM JUNK].[Status Of Application].[ACCEPTED]
+   )
+    MEMBER [Measures].[Procent] AS
+    ([Measures].[Cancelled]/[Measures].[Accepted]*100
+   )
+SELECT
+  {[Measures].[Procent]*[Issuedate].[issue_date].[Year]} ON Columns
+FROM [Example]
+
+--11
+WITH
+  MEMBER [Measures].[A] AS
+ 
+    AVG(
+		[DIM Facility].[Names].CurrentMember,
+		[Measures].[Additionals Selected]
+		)
+  SELECT
+    {[DIM Facility].[Names].Members} ON ROWS,
+	{[Measures].[A]} ON COLUMNS
+  FROM [Example]
+  WHERE [Issuedate].[Year].&[2022]
+
+--posortowało
+
+WITH
+  MEMBER [Measures].[A] AS
+    AVG(
+      [DIM Facility].[Names].CurrentMember,
+      [Measures].[Additionals Selected]
+    )
+SELECT
+  {[Measures].[A]} ON COLUMNS,
+  ORDER(
+    [DIM Facility].[Names].Members,
+    [Measures].[A],
+    DESC
+  ) ON ROWS
+FROM [Example]
+WHERE [Issuedate].[Year].&[2022]

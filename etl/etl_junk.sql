@@ -1,10 +1,14 @@
+use example
+go
+IF ((SELECT COUNT(*) FROM DIM_JUNK) < 2) 
+
 INSERT INTO [dbo].[DIM_JUNK] 
 SELECT t, m, c, s 
 FROM 
 	  (
 		VALUES 
-			  ('PRESENT')
-			, ('ABSENT')
+			  ('BOTH')
+			, ('NOT_BOTH')
 		
 	  ) 
 	AS two_parents(t)
@@ -26,7 +30,4 @@ FROM
 			  ('REJECTED')
 			, ('ACCEPTED')
 	 ) AS status_of_application(s);
-	
-SELECT * FROM DIM_JUNK
-SELECT * FROM DIM_Date
-SELECT * FROM DIM_contract
+
