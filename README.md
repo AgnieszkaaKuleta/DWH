@@ -56,4 +56,5 @@ The final view creation looks a little bit scary. In fact it just checking wheth
  
 Then, as usual using MERGE we can conduct filling the data to the FACT_application in this case.
  
-Visualisations: data_visual - Strona główna (sharepoint.com)
+Visualisations: 
+Made in Power BI and Tableau.
